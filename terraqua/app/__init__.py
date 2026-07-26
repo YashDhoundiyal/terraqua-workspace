@@ -39,7 +39,17 @@ def create_app(config_class=Config):
     app.register_blueprint(employee_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(reports_bp)
+    from app.seed import seed_cli, run_seed
+    app.cli.add_command(seed_cli)
 
+    with app.app_context():
+        db.create_all()
+
+        from app.models import User
+
+        if User.query.count() == 0:
+            run_seed()
+            
     @app.route("/")
     def index():
         if current_user.is_authenticated:
@@ -66,16 +76,12 @@ def create_app(config_class=Config):
     from app.seed import seed_cli, run_seed
     app.cli.add_command(seed_cli)
 
-    with app.app_context():
-       from app.models import User
+  with app.app_context():
+    db.create_all()
 
-if User.query.count() == 0:
-    run_seed()
+    from app.models import User
 
- from app.seed ...
-app.cli.add_command(...)
-
-with app.app_context():
-    ...
-
+    if User.query.count() == 0:
+        run_seed()
+        
 return app
