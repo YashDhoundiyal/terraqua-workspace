@@ -63,10 +63,13 @@ def create_app(config_class=Config):
         from app.utils import utcnow
         return {"current_year": utcnow().year}
 
-    from app.seed import seed_cli
+    from app.seed import seed_cli, run_seed
     app.cli.add_command(seed_cli)
 
     with app.app_context():
-        db.create_all()
+       from app.models import User
+
+if User.query.count() == 0:
+    run_seed()
 
     return app
