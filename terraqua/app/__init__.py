@@ -72,4 +72,10 @@ def create_app(config_class=Config):
 if User.query.count() == 0:
     run_seed()
 
-    return app
+ from app.seed ...
+app.cli.add_command(...)
+
+with app.app_context():
+    ...
+
+return app
