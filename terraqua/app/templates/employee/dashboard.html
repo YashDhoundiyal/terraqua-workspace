@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import kpi_card, pill, alert_banner %}
+
+{% block title %}My Dashboard — TerrAqua Workspace{% endblock %}
+{% block page_title %}My Dashboard{% endblock %}
+{% block page_subtitle %}{{ current_user.department }}{% endblock %}
+
+{% block content %}
+
+  {% if alerts %}
+    <div class="mb-3">{% for a in alerts %}{{ alert_banner(a) }}{% endfor %}</div>
+  {% endif %}
+
+  <div class="tq-kpi-grid">
+    {% for k in kpis %}{{ kpi_card(k) }}{% endfor %}
+  </div>
+
+  <div class="tq-panel">
+    <div class="tq-panel-title"><span><i class="bi bi-calendar-week me-1"></i> This Week</span>
+      <a href="{{ url_for('reports.export_weekly_summary_pdf') }}" class="btn btn-sm btn-tq-outline"><i class="bi bi-download me-1"></i>Export PDF</a>
+    </div>
+    <div class="row g-3 text-center">
+      <div class="col-4"><div class="fs-4" style="font-family:var(--tq-font-mono);">{{ summary.completed_this_week }}</div><div class="small text-muted">Completed</div></div>
+      <div class="col-4"><div class="fs-4" style="font-family:var(--tq-font-mono);">{{ summary.new_tasks_this_week }}</div><div class="small text-muted">New this week</div></div>
+      <div class="col-4"><div class="fs-4" style="font-family:var(--tq-font-mono);">{{ summary.upcoming_deadlines }}</div><div class="small text-muted">Due next 7 days</div></div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-1">
+    <div class="col-md-4">
+      <div class="tq-panel tq-chart-card"><div class="tq-panel-title">My Task Status</div><div class="tq-chart-wrap"><canvas data-chart="task-status"></canvas></div></div>
+    </div>
+    <div class="col-md-4">
+      <div class="tq-panel tq-chart-card"><div class="tq-panel-title">Priority Breakdown</div><div class="tq-chart-wrap"><canvas data-chart="priority-breakdown"></canvas></div></div>
+    </div>
+    <div class="col-md-4">
+      <div class="tq-panel tq-chart-card"><div class="tq-panel-title">My Completion Trend</div><div class="tq-chart-wrap"><canvas data-chart="completion-trend"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="tq-panel">
+        <div class="tq-panel-title"><span>Upcoming Tasks</span><a href="{{ url_for('employee.tasks') }}" class="small">View all &rarr;</a></div>
+        {% if recent_tasks %}
+        <div class="table-responsive">
+          <table class="table tq-table align-middle mb-0">
+            <thead><tr><th>Task</th><th>Due</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for t in recent_tasks %}
+              <tr class="{{ 'table-danger bg-opacity-10' if t.is_overdue }}">
+                <td>{{ t.title }}<div class="small text-muted">{{ t.project.name if t.project else '—' }}</div></td>
+                <td class="fw-mono small">{{ t.due_date.strftime('%b %d') if t.due_date else '—' }}</td>
+                <td>{{ pill(t.status) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="tq-empty"><i class="bi bi-emoji-smile"></i>Nothing on your plate right now.</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="tq-panel">
+        <div class="tq-panel-title"><span><i class="bi bi-calendar3 me-1"></i> Calendar</span></div>
+        <div id="tq-calendar"></div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

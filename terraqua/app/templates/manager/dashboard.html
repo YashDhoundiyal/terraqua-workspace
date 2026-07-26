@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import kpi_card, pill, alert_banner %}
+
+{% block title %}Manager Dashboard — TerrAqua Workspace{% endblock %}
+{% block page_title %}Manager Dashboard{% endblock %}
+{% block page_subtitle %}{{ current_user.department }}{% endblock %}
+
+{% block content %}
+
+  {% if alerts %}
+    <div class="mb-3">{% for a in alerts %}{{ alert_banner(a) }}{% endfor %}</div>
+  {% endif %}
+
+  <div class="tq-kpi-grid">
+    {% for k in kpis %}{{ kpi_card(k) }}{% endfor %}
+  </div>
+
+  <div class="tq-panel">
+    <div class="tq-panel-title"><span><i class="bi bi-calendar-week me-1"></i> This Week</span>
+      <a href="{{ url_for('reports.export_weekly_summary_pdf') }}" class="btn btn-sm btn-tq-outline"><i class="bi bi-download me-1"></i>Export PDF</a>
+    </div>
+    <div class="row g-3 text-center">
+      <div class="col-6 col-md-3"><div class="fs-4" style="font-family:var(--tq-font-mono);">{{ summary.completed_this_week }}</div><div class="small text-muted">Tasks completed</div></div>
+      <div class="col-6 col-md-3"><div class="fs-4" style="font-family:var(--tq-font-mono);">{{ summary.new_tasks_this_week }}</div><div class="small text-muted">New tasks created</div></div>
+      <div class="col-6 col-md-3"><div class="fs-4" style="font-family:var(--tq-font-mono);">{{ summary.upcoming_deadlines }}</div><div class="small text-muted">Deadlines (7 days)</div></div>
+      <div class="col-6 col-md-3"><div class="fs-4" style="font-family:var(--tq-font-mono);">{{ summary.new_clients_this_week }}</div><div class="small text-muted">New CRM leads</div></div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-1">
+    <div class="col-md-3">
+      <div class="tq-panel tq-chart-card"><div class="tq-panel-title">Task Status</div><div class="tq-chart-wrap"><canvas data-chart="task-status"></canvas></div></div>
+    </div>
+    <div class="col-md-6">
+      <div class="tq-panel tq-chart-card"><div class="tq-panel-title">Completion Trend</div><div class="tq-chart-wrap"><canvas data-chart="completion-trend"></canvas></div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="tq-panel tq-chart-card"><div class="tq-panel-title">CRM Pipeline</div><div class="tq-chart-wrap"><canvas data-chart="crm-pipeline"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-5">
+      <div class="tq-panel tq-chart-card"><div class="tq-panel-title">Team Workload</div><div class="tq-chart-wrap"><canvas data-chart="team-workload"></canvas></div></div>
+    </div>
+    <div class="col-md-7">
+      <div class="tq-panel">
+        <div class="tq-panel-title"><span>My Projects</span><a href="{{ url_for('manager.tasks') }}" class="small">Manage tasks &rarr;</a></div>
+        {% if projects %}
+        <div class="table-responsive">
+          <table class="table tq-table align-middle mb-0">
+            <thead><tr><th>Project</th><th>Status</th><th>Progress</th></tr></thead>
+            <tbody>
+              {% for p in projects %}
+              <tr>
+                <td>{{ p.name }}</td>
+                <td>
+                  <form method="POST" action="{{ url_for('manager.update_project', project_id=p.id) }}">
+                    <select name="status" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+                      {% for s in ['planning', 'active', 'on_hold', 'completed'] %}
+                      <option value="{{ s }}" {{ 'selected' if s == p.status }}>{{ s.replace('_',' ')|title }}</option>
+                      {% endfor %}
+                    </select>
+                  </form>
+                </td>
+                <td style="width:150px;">
+                  <form method="POST" action="{{ url_for('manager.update_project', project_id=p.id) }}">
+                    <input type="range" name="progress" min="0" max="100" value="{{ p.progress }}"
+                           class="form-range" onchange="this.form.submit()">
+                  </form>
+                  <div class="small text-muted">{{ p.progress }}%</div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="tq-empty"><i class="bi bi-kanban"></i>No projects assigned yet.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="tq-panel">
+    <div class="tq-panel-title"><span><i class="bi bi-calendar3 me-1"></i> Calendar</span></div>
+    <div id="tq-calendar"></div>
+  </div>
+
+{% endblock %}

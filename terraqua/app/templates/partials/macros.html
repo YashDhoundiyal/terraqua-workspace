@@ -1,0 +1,18 @@
+{% macro kpi_card(k) %}
+<div class="tq-kpi-card">
+  <div class="tq-kpi-icon tone-{{ k.tone }}"><i class="bi {{ k.icon }}"></i></div>
+  <div class="tq-kpi-value">{{ k.value }}</div>
+  <div class="tq-kpi-label">{{ k.label }}</div>
+</div>
+{% endmacro %}
+
+{% macro pill(value) %}
+<span class="tq-pill pill-{{ value }}">{{ value.replace('_', ' ') | title }}</span>
+{% endmacro %}
+
+{% macro alert_banner(a) %}
+<div class="tq-alert {{ a.level }}">
+  <i class="bi {{ a.icon }}"></i>
+  <span>{{ a.message }}</span>
+</div>
+{% endmacro %}

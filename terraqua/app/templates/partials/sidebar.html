@@ -1,0 +1,61 @@
+<div class="tq-sidebar">
+  <div class="tq-brand">
+    <span class="tq-brand-mark">TQ</span>
+    <span>TerrAqua<br><small>Workspace</small></span>
+  </div>
+
+  <nav class="tq-nav">
+    {% if current_user.role == 'admin' %}
+      <div class="tq-nav-section">Overview</div>
+      <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint == 'admin.dashboard' }}">
+        <i class="bi bi-speedometer2"></i> Dashboard</a>
+
+      <div class="tq-nav-section">Manage</div>
+      <a href="{{ url_for('admin.projects') }}" class="{{ 'active' if request.endpoint == 'admin.projects' }}">
+        <i class="bi bi-kanban"></i> Projects</a>
+      <a href="{{ url_for('admin.crm') }}" class="{{ 'active' if request.endpoint == 'admin.crm' }}">
+        <i class="bi bi-person-lines-fill"></i> CRM</a>
+      <a href="{{ url_for('admin.users') }}" class="{{ 'active' if request.endpoint == 'admin.users' }}">
+        <i class="bi bi-people"></i> Team &amp; Roles</a>
+
+      <div class="tq-nav-section">Reports</div>
+      <a href="{{ url_for('reports.export_tasks_csv') }}"><i class="bi bi-filetype-csv"></i> Tasks CSV</a>
+      <a href="{{ url_for('reports.export_projects_csv') }}"><i class="bi bi-filetype-csv"></i> Projects CSV</a>
+      <a href="{{ url_for('reports.export_clients_csv') }}"><i class="bi bi-filetype-csv"></i> Clients CSV</a>
+      <a href="{{ url_for('reports.export_weekly_summary_pdf') }}"><i class="bi bi-file-earmark-pdf"></i> Weekly Summary PDF</a>
+
+    {% elif current_user.role == 'manager' %}
+      <div class="tq-nav-section">Overview</div>
+      <a href="{{ url_for('manager.dashboard') }}" class="{{ 'active' if request.endpoint == 'manager.dashboard' }}">
+        <i class="bi bi-speedometer2"></i> Dashboard</a>
+
+      <div class="tq-nav-section">Manage</div>
+      <a href="{{ url_for('manager.tasks') }}" class="{{ 'active' if request.endpoint == 'manager.tasks' }}">
+        <i class="bi bi-list-check"></i> Tasks</a>
+      <a href="{{ url_for('manager.crm') }}" class="{{ 'active' if request.endpoint == 'manager.crm' }}">
+        <i class="bi bi-person-lines-fill"></i> My CRM</a>
+
+      <div class="tq-nav-section">Reports</div>
+      <a href="{{ url_for('reports.export_tasks_csv') }}"><i class="bi bi-filetype-csv"></i> Tasks CSV</a>
+      <a href="{{ url_for('reports.export_projects_csv') }}"><i class="bi bi-filetype-csv"></i> Projects CSV</a>
+      <a href="{{ url_for('reports.export_weekly_summary_pdf') }}"><i class="bi bi-file-earmark-pdf"></i> Weekly Summary PDF</a>
+
+    {% else %}
+      <div class="tq-nav-section">Overview</div>
+      <a href="{{ url_for('employee.dashboard') }}" class="{{ 'active' if request.endpoint == 'employee.dashboard' }}">
+        <i class="bi bi-speedometer2"></i> Dashboard</a>
+
+      <div class="tq-nav-section">Work</div>
+      <a href="{{ url_for('employee.tasks') }}" class="{{ 'active' if request.endpoint == 'employee.tasks' }}">
+        <i class="bi bi-list-check"></i> My Tasks</a>
+
+      <div class="tq-nav-section">Reports</div>
+      <a href="{{ url_for('reports.export_tasks_csv') }}"><i class="bi bi-filetype-csv"></i> My Tasks CSV</a>
+      <a href="{{ url_for('reports.export_weekly_summary_pdf') }}"><i class="bi bi-file-earmark-pdf"></i> Weekly Summary PDF</a>
+    {% endif %}
+  </nav>
+
+  <div class="tq-sidebar-footer">
+    Signed in as<br><strong style="color:#fff;">{{ current_user.full_name }}</strong>
+  </div>
+</div>

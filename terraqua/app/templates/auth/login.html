@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in — TerrAqua Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+  <div class="tq-login-wrap">
+    <div class="tq-login-card">
+      <div class="tq-login-brand">
+        <span class="tq-brand-mark" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;">TQ</span>
+        <div>
+          <div class="display-font" style="font-size:1.1rem; line-height:1.1;">TerrAqua Workspace</div>
+          <small class="text-muted">Dashboard &amp; Analytics Platform</small>
+        </div>
+      </div>
+
+      {% include "partials/flash.html" %}
+
+      <form method="POST" action="{{ url_for('auth.login') }}">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Username</label>
+          <input type="text" name="username" class="form-control" placeholder="e.g. admin" autofocus required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Password</label>
+          <input type="password" name="password" class="form-control" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required>
+        </div>
+        <button type="submit" class="btn btn-tq-primary w-100 fw-semibold py-2">Sign in</button>
+      </form>
+
+      <div class="tq-demo-creds">
+        <strong class="d-block mb-1">Demo credentials</strong>
+        <div class="d-flex justify-content-between"><span>Admin</span><code>admin / admin123</code></div>
+        <div class="d-flex justify-content-between"><span>Manager</span><code>manager1 / manager123</code></div>
+        <div class="d-flex justify-content-between"><span>Employee</span><code>employee1 / employee123</code></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

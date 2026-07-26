@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import pill %}
+
+{% block title %}My Tasks — TerrAqua Workspace{% endblock %}
+{% block page_title %}My Tasks{% endblock %}
+{% block page_subtitle %}Everything assigned to you{% endblock %}
+
+{% block content %}
+
+  <div class="tq-panel">
+    <div class="tq-panel-title"><span><i class="bi bi-list-check me-1"></i> {{ tasks|length }} task{{ 's' if tasks|length != 1 }}</span></div>
+
+    <form method="GET" class="row g-2 mb-3">
+      <div class="col-auto">
+        <input type="text" name="q" value="{{ search }}" class="form-control form-control-sm" placeholder="Search my tasks…">
+      </div>
+      <div class="col-auto">
+        <select name="status" class="form-select form-select-sm">
+          <option value="">All statuses</option>
+          {% for s in ['todo', 'in_progress', 'review', 'done'] %}
+            <option value="{{ s }}" {{ 'selected' if status == s }}>{{ s.replace('_',' ')|title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto"><button class="btn btn-sm btn-tq-outline" type="submit">Filter</button></div>
+      {% if status or search %}<div class="col-auto"><a href="{{ url_for('employee.tasks') }}" class="btn btn-sm btn-link">Clear</a></div>{% endif %}
+    </form>
+
+    {% if tasks %}
+    <div class="table-responsive">
+      <table class="table tq-table align-middle">
+        <thead><tr><th>Task</th><th>Project</th><th>Priority</th><th>Due</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for t in tasks %}
+          <tr class="{{ 'table-danger bg-opacity-10' if t.is_overdue }}">
+            <td>{{ t.title }}<div class="small text-muted">{{ t.description[:60] }}{{ '…' if t.description and t.description|length > 60 }}</div></td>
+            <td class="small text-muted">{{ t.project.name if t.project else '—' }}</td>
+            <td>{{ pill(t.priority) }}</td>
+            <td class="fw-mono small">{{ t.due_date.strftime('%b %d, %Y') if t.due_date else '—' }}{% if t.is_overdue %}<span class="text-danger d-block">Overdue</span>{% endif %}</td>
+            <td style="width:160px;">
+              <form method="POST" action="{{ url_for('employee.task_status', task_id=t.id) }}">
+                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                  {% for s in ['todo', 'in_progress', 'review', 'done'] %}
+                  <option value="{{ s }}" {{ 'selected' if s == t.status }}>{{ s.replace('_',' ')|title }}</option>
+                  {% endfor %}
+                </select>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="tq-empty"><i class="bi bi-list-check"></i>No tasks match those filters.</div>
+    {% endif %}
+  </div>
+
+{% endblock %}

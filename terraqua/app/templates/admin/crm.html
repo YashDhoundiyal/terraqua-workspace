@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import pill %}
+
+{% block title %}CRM — TerrAqua Workspace{% endblock %}
+{% block page_title %}CRM{% endblock %}
+{% block page_subtitle %}Client relationships and pipeline{% endblock %}
+
+{% block content %}
+
+  <div class="tq-panel">
+    <div class="tq-panel-title">
+      <span><i class="bi bi-person-lines-fill me-1"></i> {{ clients|length }} client{{ 's' if clients|length != 1 }}</span>
+      <button class="btn btn-sm btn-tq-primary" data-bs-toggle="modal" data-bs-target="#addClientModal">
+        <i class="bi bi-plus-lg me-1"></i>New Client</button>
+    </div>
+
+    <form method="GET" class="row g-2 mb-3">
+      <div class="col-auto">
+        <input type="text" name="q" value="{{ search }}" class="form-control form-control-sm" placeholder="Search clients…">
+      </div>
+      <div class="col-auto">
+        <select name="status" class="form-select form-select-sm">
+          <option value="">All statuses</option>
+          {% for s in ['lead', 'qualified', 'active', 'inactive'] %}
+            <option value="{{ s }}" {{ 'selected' if status == s }}>{{ s|title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto"><button class="btn btn-sm btn-tq-outline" type="submit">Filter</button></div>
+      {% if status or search %}<div class="col-auto"><a href="{{ url_for('admin.crm') }}" class="btn btn-sm btn-link">Clear</a></div>{% endif %}
+    </form>
+
+    {% if clients %}
+    <div class="table-responsive">
+      <table class="table tq-table align-middle">
+        <thead><tr><th>Client</th><th>Contact</th><th>Status</th><th>Deal Value</th><th>Owner</th><th>Last Contact</th></tr></thead>
+        <tbody>
+          {% for c in clients %}
+          <tr>
+            <td><strong>{{ c.name }}</strong><div class="small text-muted">{{ c.company }}</div></td>
+            <td class="small">{{ c.email }}<div class="text-muted">{{ c.phone }}</div></td>
+            <td>{{ pill(c.status) }}</td>
+            <td class="fw-mono">&#8377;{{ '{:,.0f}'.format(c.deal_value) }}</td>
+            <td class="small">{{ c.owner.full_name if c.owner else '—' }}</td>
+            <td class="small text-muted">{{ c.last_contact.strftime('%b %d, %Y') if c.last_contact else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="tq-empty"><i class="bi bi-person-lines-fill"></i>No clients match those filters.</div>
+    {% endif %}
+  </div>
+
+  <div class="modal fade" id="addClientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <form method="POST" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title display-font" style="font-size:1.05rem;">New Client</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label small fw-semibold">Client name</label>
+              <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="col">
+              <label class="form-label small fw-semibold">Company</label>
+              <input type="text" name="company" class="form-control">
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label small fw-semibold">Email</label>
+              <input type="email" name="email" class="form-control">
+            </div>
+            <div class="col">
+              <label class="form-label small fw-semibold">Phone</label>
+              <input type="text" name="phone" class="form-control">
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label small fw-semibold">Status</label>
+              <select name="status" class="form-select">
+                {% for s in ['lead', 'qualified', 'active', 'inactive'] %}
+                <option value="{{ s }}">{{ s|title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col">
+              <label class="form-label small fw-semibold">Deal value (&#8377;)</label>
+              <input type="number" name="deal_value" class="form-control" min="0" step="1000" value="0">
+            </div>
+          </div>
+          <div class="mb-1">
+            <label class="form-label small fw-semibold">Assign to</label>
+            <select name="assigned_to" class="form-select">
+              <option value="">Unassigned</option>
+              {% for o in owners %}<option value="{{ o.id }}">{{ o.full_name }} ({{ o.role|title }})</option>{% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-tq-primary">Add client</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
